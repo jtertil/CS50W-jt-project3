@@ -34,6 +34,8 @@ class Pizza(models.Model):
 
     type = models.ForeignKey(PizzaType, on_delete=models.CASCADE)
     size = models.ForeignKey(Size, on_delete=models.CASCADE)
+
+    available_toppings = models.ManyToManyField(PizzaTopping)
     toppings_amount = models.IntegerField(
         choices=TOPPINGS_AMOUNT_CHOICES,
         default=0
@@ -41,5 +43,4 @@ class Pizza(models.Model):
     cost = models.DecimalField(max_digits=6, decimal_places=2)
 
     def __str__(self):
-        return f'{self.size} {self.type}' \
-               f' {self.get_toppings_amount_display()} - {self.cost}$'
+        return f'{self.type} {self.get_toppings_amount_display()} {self.size} - {self.cost}$'

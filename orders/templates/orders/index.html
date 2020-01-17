@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<body>
+<h1>Pizza menu:</h1>
+<ul>
+  {% for pizza_type in available_pizzas_types %}
+  <li>
+    <h2>{{ pizza_type }} type:</h2>
+    <ul>
+      {% for pizza in available_pizzas %}
+      {% if pizza.type.name == pizza_type %}
+      <li>
+        {{ pizza.get_toppings_amount_display }} {{ pizza.size }} {{ pizza.cost }}
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+  </li>
+  {% endfor %}
+</ul>
+
+
+</body>
+<head>
+  <meta charset="UTF-8">
+  <title>Index</title>
+</head>
+</html>

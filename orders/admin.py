@@ -6,3 +6,4 @@ admin.site.register(Pizza)
 admin.site.register(PizzaType)
 admin.site.register(Size)
 admin.site.register(PizzaTopping)
+
