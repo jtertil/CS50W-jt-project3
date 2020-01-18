@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <body>
+{% if available_pizzas %}
 <h1>Pizza menu:</h1>
 <ul>
   {% for pizza_type in available_pizzas_types %}
@@ -10,14 +11,64 @@
       {% for pizza in available_pizzas %}
       {% if pizza.type.name == pizza_type %}
       <li>
-        {{ pizza.get_toppings_amount_display }} {{ pizza.size }} {{ pizza.cost }}
+        {{ pizza.get_toppings_amount_display }} {{ pizza.size }} {{ pizza.cost }}$
       </li>
       {% endif %}
       {% endfor %}
     </ul>
   </li>
   {% endfor %}
+  {% if pizza_toppings %}
+  <h2>pizza toppings:</h2>
+  {% for topping in pizza_toppings %}
+  {{ topping }},
+  {% endfor %}
+  {% endif %}
 </ul>
+{% endif %}
+{% if available_subs %}
+<h1>Subs menu:</h1>
+<ul>
+  {% for sub in available_subs %}
+  <li>
+    {{ sub }}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if available_pastas %}
+<h1>Pastas menu:</h1>
+<ul>
+  {% for pasta in available_pastas %}
+  <li>
+    {{ pasta }}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if available_salads %}
+<h1>Salads menu:</h1>
+<ul>
+  {% for salad in available_salads %}
+  <li>
+    {{ salad }}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+{% if available_dinner_platters %}
+<h1>Dinner Platters menu:</h1>
+<ul>
+  {% for platter in available_dinner_platters %}
+  <li>
+    {{ platter }}
+  </li>
+  {% endfor %}
+</ul>
+{% endif %}
 
 
 </body>
