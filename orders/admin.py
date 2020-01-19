@@ -1,17 +1,12 @@
 from django.contrib import admin
 
-from .models import PizzaTopping, Size, Pizza, PizzaType, SubExtra, Sub, Pasta, \
-    Salad, DinnerPlatters
+from .models import MealSize, MealType, Meal, Ingredient
 
-admin.site.register(Pizza)
-admin.site.register(PizzaType)
-admin.site.register(Size)
-admin.site.register(PizzaTopping)
-admin.site.register(SubExtra)
-admin.site.register(Sub)
-admin.site.register(Pasta)
-admin.site.register(Salad)
-admin.site.register(DinnerPlatters)
+admin.site.register(Meal)
+admin.site.register(Ingredient)
+admin.site.register(MealSize)
+admin.site.register(MealType)
+
 
 
 
