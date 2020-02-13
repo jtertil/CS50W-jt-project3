@@ -1,15 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Login</title>
-</head>
-<body>
+{% extends "orders/base.html" %}
+{% block title %}Login{% endblock %}
+
+{% block body %}
   <h1>Login</h1>
   <form action="{% url 'login' %}" method="post">
     {% csrf_token %}
-    {{form.as_p}}
-    <button type="submit">submit</button>
+    {% include 'orders/bootstrap_form.html' with form=form %}
+    <button type="submit" class="btn btn-primary">Submit</button>
   </form>
-</body>
-</html>
+{% endblock %}

@@ -23,7 +23,7 @@ def user(request):
 
 
 def login_view(request):
-    if request.POST:
+    if request.method == 'POST':
         form = AuthenticationForm(request=request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
@@ -45,11 +45,13 @@ def logout_view(request):
 
 
 def register(request):
-    if request.POST:
+    if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
             user = form.save()
             login(request, user)
             return HttpResponseRedirect(reverse("user"))
+        else:
+            return render(request, "orders/register.html", {'form': form})
     form = UserCreationForm
     return render(request, "orders/register.html", {'form': form})
