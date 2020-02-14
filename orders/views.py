@@ -6,6 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .models import Meal
+from .forms import MealSelectForm
 
 
 def index(request):
@@ -56,4 +57,19 @@ def register(request):
     return render(request, "orders/register.html", {'form': form})
 
 
+def order(request):
+    form = MealSelectForm
+    if request.method == 'POST':
+        print(request.POST['type'])
+        print(request.POST['meal'])
+    return render(request, "orders/order.html", {'form': form})
 
+
+def load_meals(request):
+    meal_type_id = request.GET.get('id_type')
+    try:
+        meals = Meal.objects.filter(type=meal_type_id)
+    except ValueError:
+        return render(request, "orders/meals_options.html")
+
+    return render(request, "orders/meals_options.html", {'meals': meals})
