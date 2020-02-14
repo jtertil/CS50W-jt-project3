@@ -5,14 +5,13 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Meal, MealType
+from .models import Meal
 
 
 def index(request):
     m = Meal.objects.select_related('type', 'size').all()
-    mt = MealType.objects.values()
 
-    return render(request, 'orders/index.html', {'m': m, 'mt': mt})
+    return render(request, 'orders/index.html', {'m': m})
 
 
 def user(request):
@@ -55,3 +54,6 @@ def register(request):
             return render(request, "orders/register.html", {'form': form})
     form = UserCreationForm
     return render(request, "orders/register.html", {'form': form})
+
+
+
