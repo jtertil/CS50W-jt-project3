@@ -3,10 +3,25 @@
 {% block title %}Order{% endblock %}
 
 {% block body %}
+
   <h1>Order</h1>
-  <form id="meal_form" ajax_load_meals="{% url 'ajax_load_meals' %}" method="post" novalidate>
+  <form
+          id="order_form"
+          ajax_load_meals="{% url 'ajax_load_meals' %}"
+          ajax_load_ingredients="{% url 'ajax_load_ingredients' %}"
+          method="post"
+          novalidate>
     {% csrf_token %}
-    {% include 'orders/bootstrap_form.html' with form=form %}
+    <div class="form-group" id="type-select">
+      <label for="id_type">What would you like to eat?</label>
+      <select class="form-control" name="type" id="id_type">
+        {% for type in form.type %}
+        {{ type }}
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group" id="meal-select"></div>
+    <div class="form-group" id="ingredients-select"></div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
 {% endblock %}
@@ -14,20 +29,35 @@
 
 {% block scripts %}
   <script>
-      $("#id_type").change(function () {
-      let ajax_url = $("#meal_form").attr("ajax_load_meals");
-      let selected_id_type = $(this).val();
+    $(document).ready(function () {
+      $("#order_form")[0].reset()
+      });
 
+    $(document).ready(function() {
+      $('#id_type').select2()
+    });
+
+    $("#id_type").change(function () {
+
+    let ajax_url = $("#order_form").attr("ajax_load_meals");
+    let selected_type_id = $(this).val();
+
+    $("#ingredients-select").hide()
+
+    if (selected_type_id) {
       $.ajax({
         url: ajax_url,
         data: {
-          'id_type': selected_id_type
+          'id_type': selected_type_id
         },
         success: function(data) {
-          $("#id_meal").html(data);
+          $("#meal-select").html(data);
+          $("#meal-select").show()
         }
       });
-
+     } else {
+      $("#meal-select").hide()
+      }
     });
   </script>
 {% endblock %}

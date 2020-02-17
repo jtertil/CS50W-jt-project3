@@ -1,0 +1,21 @@
+{% if num %}
+<div class="form-group" id="ingredients-select">
+  <label for="ingredients_id">Please select ingredients:</label>
+  <select multiple class="form-control" name="type" id="ingredients_id">
+    {% for i in ingredients %}
+    <option value="{{ i.id }}">{{ i.name }}</option>
+    {% endfor %}
+  </select>
+</div>
+<br>
+{% endif %}
+
+{% block scripts %}
+<script>
+  $(document).ready(function() {
+      $('#ingredients_id').select2({
+      maximumSelectionLength : {{ num }},
+      });
+  });
+</script>
+{% endblock %}

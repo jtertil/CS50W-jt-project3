@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import Meal
+from .models import Meal, MealType
 from .forms import MealSelectForm
 
 
@@ -72,4 +72,21 @@ def load_meals(request):
     except ValueError:
         return render(request, "orders/meals_options.html")
 
-    return render(request, "orders/meals_options.html", {'meals': meals})
+    try:
+        desc = MealType.objects.filter(id=meal_type_id).first().description
+    except ValueError:
+        return render(request, "orders/meals_options.html")
+
+    return render(
+        request, "orders/meals_options.html", {'meals': meals, 'desc': desc})
+
+
+def load_ingredients(request):
+    meal_id = request.GET.get('id_meal')
+    meal = Meal.objects.filter(id=meal_id).first()
+    ingredients = meal.available_ingredients.values()
+    num = meal.extra_ingredients
+
+    return render(
+        request, "orders/ingredients_options.html",
+        {'ingredients': ingredients, 'num': num})
