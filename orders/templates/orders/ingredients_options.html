@@ -1,9 +1,23 @@
-{% if num %}
-<div class="form-group" id="ingredients-select">
-  <label for="ingredients_id">Please select ingredients:</label>
-  <select multiple class="form-control" name="type" id="ingredients_id">
-    {% for i in ingredients %}
-    <option value="{{ i.id }}">{{ i.name }}</option>
+{% if num_of_toppings %}
+<div class="form-group" id="topping-select">
+  {% for i in toppings_range %}
+  <label for="id_topping{{ i }}">Please select {{ i }} topping:</label>
+  <select class="form-control toppings" name="toppings" id="id_topping{{ i }}">
+    {% for topping in toppings %}
+    <option value="{{ topping.id }}">{{ topping.name }}</option>
+    {% endfor %}
+  </select>
+  {% endfor %}
+</div>
+<br>
+{% endif %}
+
+{% if num_of_extras %}
+<div class="form-group" id="extras-select">
+  <label for="id_extras{{ i }}">Available extras (each +{{ extras_price }}$):</label>
+  <select multiple class="form-control extras" name="extras" id="id_extras{{ i }}">
+    {% for extra in extras %}
+    <option value="{{ extra.id }}">{{ extra.name }}</option>
     {% endfor %}
   </select>
 </div>
@@ -13,9 +27,13 @@
 {% block scripts %}
 <script>
   $(document).ready(function() {
-      $('#ingredients_id').select2({
-      maximumSelectionLength : {{ num }},
-      });
+      $('.form-control.toppings').select2();
+  });
+
+  $(document).ready(function() {
+      $('.form-control.extras').select2({
+        maximumSelectionLength : {{ num_of_extras }},
+     });
   });
 </script>
 {% endblock %}

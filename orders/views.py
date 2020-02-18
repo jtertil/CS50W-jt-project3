@@ -84,9 +84,20 @@ def load_meals(request):
 def load_ingredients(request):
     meal_id = request.GET.get('id_meal')
     meal = Meal.objects.filter(id=meal_id).first()
-    ingredients = meal.available_ingredients.values()
-    num = meal.extra_ingredients
+    num_of_toppings = meal.num_of_toppings
+    toppings = meal.available_toppings.values()
+
+    num_of_extras = meal.num_of_extras
+    extras = meal.available_extras.values()
+    extras_price = meal.extras_price
 
     return render(
         request, "orders/ingredients_options.html",
-        {'ingredients': ingredients, 'num': num})
+        {'toppings': toppings,
+         'num_of_toppings': num_of_toppings,
+         'toppings_range': range(1, num_of_toppings+1),
+         'extras': extras,
+         'num_of_extras': num_of_extras,
+         'extras_range': range(1, num_of_extras+1),
+         'extras_price': extras_price
+         })
