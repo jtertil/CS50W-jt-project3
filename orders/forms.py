@@ -23,6 +23,11 @@ class UserLoginForm(AuthenticationForm):
 
 
 class MealSelectForm(forms.ModelForm):
+    extras = forms.SelectMultiple()
+    toppings = forms.SelectMultiple()
+    special_instructions = forms.CharField(
+        max_length=300, help_text='Special instructions')
+
     class Meta:
         model = Meal
         fields = ('type', 'meal')

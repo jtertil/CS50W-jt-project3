@@ -58,8 +58,7 @@ def register(request):
 def order(request):
     form = MealSelectForm
     if request.method == 'POST':
-        print(request.POST['type'])
-        print(request.POST['meal'])
+        print(request.POST)
     return render(request, "orders/order.html", {'form': form})
 
 
@@ -89,6 +88,8 @@ def load_ingredients(request):
     extras = meal.available_extras.values()
     extras_price = meal.extras_price
 
+    is_special = meal.is_special
+
     return render(
         request, "orders/ingredients_options.html",
         {'toppings': toppings,
@@ -97,5 +98,6 @@ def load_ingredients(request):
          'extras': extras,
          'num_of_extras': num_of_extras,
          'extras_range': range(1, num_of_extras+1),
-         'extras_price': extras_price
+         'extras_price': extras_price,
+         'is_special': is_special
          })

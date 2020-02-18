@@ -1,5 +1,5 @@
 {% if num_of_toppings %}
-<div class="form-group" id="topping-select">
+<div class="form-group" name="toppings" id="topping-select">
   {% for i in toppings_range %}
   <label for="id_topping{{ i }}">Please select {{ i }} topping:</label>
   <select class="form-control toppings" name="toppings" id="id_topping{{ i }}">
@@ -15,13 +15,24 @@
 {% if num_of_extras %}
 <div class="form-group" id="extras-select">
   <label for="id_extras{{ i }}">Available extras (each +{{ extras_price }}$):</label>
-  <select multiple class="form-control extras" name="extras" id="id_extras{{ i }}">
+  <select multiple class="form-control extras" name="extras{{ i }}" id="id_extras{{ i }}">
     {% for extra in extras %}
     <option value="{{ extra.id }}">{{ extra.name }}</option>
     {% endfor %}
   </select>
 </div>
 <br>
+{% endif %}
+
+{% if is_special %}
+  <div class="form-group">
+    <label for="special_instructions">Any special instructions?</label>
+    <textarea
+            class="form-control"
+            name="special_instructions"
+            id="special_instructions"
+            rows="3"></textarea>
+  </div>
 {% endif %}
 
 {% block scripts %}
