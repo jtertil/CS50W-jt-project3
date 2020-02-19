@@ -1,13 +1,11 @@
 {% if num_of_toppings %}
-<div class="form-group" name="toppings" id="topping-select">
-  {% for i in toppings_range %}
+<div class="form-group" id="topping-select">
   <label for="id_topping{{ i }}">Please select {{ i }} topping:</label>
-  <select class="form-control toppings" name="toppings" id="id_topping{{ i }}">
+  <select multiple class="form-control toppings" name="toppings" id="id_topping{{ i }}">
     {% for topping in toppings %}
     <option value="{{ topping.id }}">{{ topping.name }}</option>
     {% endfor %}
   </select>
-  {% endfor %}
 </div>
 <br>
 {% endif %}
@@ -38,7 +36,9 @@
 {% block scripts %}
 <script>
   $(document).ready(function() {
-      $('.form-control.toppings').select2();
+      $('.form-control.toppings').select2({
+        maximumSelectionLength : {{ num_of_toppings }},
+     });
   });
 
   $(document).ready(function() {

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Meal
+from .models import Meal, Ingredient, MealType
 
 
 class UserRegistrationForm(UserCreationForm):
@@ -23,19 +23,23 @@ class UserLoginForm(AuthenticationForm):
 
 
 class MealSelectForm(forms.ModelForm):
-    extras = forms.SelectMultiple()
-    toppings = forms.SelectMultiple()
-    special_instructions = forms.CharField(
-        max_length=300, help_text='Special instructions')
-
     class Meta:
         model = Meal
-        fields = ('type', 'meal')
+        fields = ('type', 'meal', 'extras', 'toppings', 'special_instructions')
+
+    type = forms.ModelChoiceField(queryset=MealType.objects.all())
+    meal = forms.ModelChoiceField(queryset=Meal.objects.all())
+
+    extras = forms.ModelMultipleChoiceField(
+        queryset=Ingredient.objects.all(), required=False)
+    toppings = forms.ModelMultipleChoiceField(
+        queryset=Ingredient.objects.all(), required=False)
+    special_instructions = forms.CharField(
+        max_length=300, help_text='Special instructions', required=False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['meal'].widget.attrs = {'style': 'display:none;'}
 
-    meal = forms.ModelChoiceField(queryset = Meal.objects.none())
 
 

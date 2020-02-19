@@ -9,8 +9,7 @@
           id="order_form"
           ajax_load_meals="{% url 'ajax_load_meals' %}"
           ajax_load_ingredients="{% url 'ajax_load_ingredients' %}"
-          method="post"
-          novalidate>
+          method="post">
     {% csrf_token %}
     <div class="form-group" id="type-select">
       <label for="id_type">What would you like to eat?</label>
@@ -24,6 +23,40 @@
     <div class="form-group" id="ingredients-select"></div>
     <button type="submit" class="btn btn-primary">Submit</button>
   </form>
+
+
+{% if cart %}
+<h1>Cart {{ c_value }}$</h1>
+<ul>
+{% for i in cart %}
+<li>
+  <div>
+    <h4>{{ i.meal.name }} {{ i.total_price }}$</h4>
+    {% if i.toppings %}
+    <p>toppings:</p>
+    <ul>
+      {% for t in i.toppings %}
+      <li>{{ t.name }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if i.extras %}
+    <p>extras:</p>
+    <ul>
+      {% for e in i.extras %}
+      <li>{{ e.name }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+  </div>
+</li>
+
+{% endfor %}
+</ul>
+{% else %}
+<p>empty cart</p>
+{% endif %}
+
 {% endblock %}
 
 

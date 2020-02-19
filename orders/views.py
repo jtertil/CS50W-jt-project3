@@ -57,10 +57,54 @@ def register(request):
 
 
 def order(request):
-    form = MealSelectForm
-    if request.method == 'POST':
-        print(request.POST)
-    return render(request, "orders/order.html", {'form': form})
+    form = MealSelectForm(request.POST or None)
+    # request.session['cart'] = []
+
+    c = request.session.get('cart', [])
+    request.session['cart'] = c
+
+    c_value = round(sum(i['total_price'] for i in request.session['cart']), 2)
+    print(c_value)
+
+    if not form.is_valid():
+        print(form.errors)
+
+    if request.method == 'POST' and form.is_valid():
+
+        data = form.cleaned_data
+        ordered_meal = {
+            'type': {
+                'id': data['meal'].type_id,
+                'name': data['meal'].type.name},
+            'size': {
+                'id': data['meal'].size_id,
+                'name': data['meal'].size.name},
+            'meal': {
+                'id': data['meal'].id,
+                'name': data['meal'].name},
+            'toppings': [
+                {'id': t.id, 'name': t.name} for t in data['toppings']
+            ],
+            'extras': [
+                {'id': e.id, 'name': e.name} for e in data['extras']
+            ],
+            'is_special':
+                data['meal'].is_special,
+            'special_instructions':
+                data['special_instructions'],
+            'base_price':
+                float(data['meal'].price),
+            'total_price':
+                float(data['meal'].calculate_total_price(len(data['extras'])))
+        }
+
+        c.append(ordered_meal)
+        print(request.session['cart'])
+
+    return render(
+        request,
+        "orders/order.html",
+        {'form': form, 'cart': c, 'c_value': c_value})
 
 
 def load_meals(request):

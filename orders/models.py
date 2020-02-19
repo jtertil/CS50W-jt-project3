@@ -40,11 +40,14 @@ class Meal(models.Model):
         Ingredient, related_name='extras', blank=True)
     extras_price = models.DecimalField(
         max_digits=6, decimal_places=2, null=True, blank=True)
-
-    price = models.DecimalField(max_digits=6, decimal_places=2)
+    price = models.DecimalField(
+        max_digits=6, decimal_places=2)
 
     def __str__(self):
         return f'{self.name} - {self.price}$ '
 
-
-
+    def calculate_total_price(self, num_of_extras=0):
+        if self.extras_price:
+            return self.price + (num_of_extras * self.extras_price)
+        else:
+            return self.price
