@@ -23,11 +23,11 @@ def user(request):
 
 def login_view(request):
     if request.method == 'POST':
-        form = UserLoginForm(request=request, data=request.POST)
+        form = UserLoginForm(request = request, data = request.POST)
         if form.is_valid():
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
-            user = authenticate(username=username, password=password)
+            user = authenticate(username = username, password = password)
             if user:
                 login(request, user)
                 return HttpResponseRedirect(reverse("user"))
@@ -57,65 +57,71 @@ def register(request):
 
 
 def order(request):
-    form = MealSelectForm(request.POST or None)
     # request.session['cart'] = []
-
-    c = request.session.get('cart', [])
-    request.session['cart'] = c
-
-    c_value = round(sum(i['total_price'] for i in request.session['cart']), 2)
-    print(c_value)
+    form = MealSelectForm(request.POST)
 
     if not form.is_valid():
         print(form.errors)
 
     if request.method == 'POST' and form.is_valid():
+        add_to_cart(request, form)
 
-        data = form.cleaned_data
-        ordered_meal = {
-            'type': {
-                'id': data['meal'].type_id,
-                'name': data['meal'].type.name},
-            'size': {
-                'id': data['meal'].size_id,
-                'name': data['meal'].size.name},
-            'meal': {
-                'id': data['meal'].id,
-                'name': data['meal'].name},
-            'toppings': [
-                {'id': t.id, 'name': t.name} for t in data['toppings']
-            ],
-            'extras': [
-                {'id': e.id, 'name': e.name} for e in data['extras']
-            ],
-            'is_special':
-                data['meal'].is_special,
-            'special_instructions':
-                data['special_instructions'],
-            'base_price':
-                float(data['meal'].price),
-            'total_price':
-                float(data['meal'].calculate_total_price(len(data['extras'])))
-        }
+    return render(request, "orders/order.html", {'form': form})
 
-        c.append(ordered_meal)
-        print(request.session['cart'])
+
+def add_to_cart(request, form):
+    cart = request.session.get('cart', [])
+    request.session['cart'] = cart
+
+    fcd = form.cleaned_data
+    ordered_meal = {
+        'type': {
+            'id': fcd['meal'].type_id,
+            'name': fcd['meal'].type.name},
+        'size': {
+            'id': fcd['meal'].size_id,
+            'name': fcd['meal'].size.name if fcd['meal'].size_id else None},
+        'meal': {
+            'id': fcd['meal'].id,
+            'name': fcd['meal'].name},
+        'toppings': [
+            {'id': t.id, 'name': t.name} for t in
+            fcd['toppings'][:fcd['meal'].num_of_toppings]
+        ],
+        'extras': [
+            {'id': e.id, 'name': e.name} for e in
+            fcd['extras'][:fcd['meal'].num_of_extras]
+        ],
+        'is_special':
+            fcd['meal'].is_special,
+        'special_instructions':
+            fcd['special_instructions'],
+        'base_price':
+            float(fcd['meal'].price),
+        'total_price':
+            float(fcd['meal'].calculate_total_price(len(fcd['extras'])))
+    }
+
+    cart.append(ordered_meal)
+
+
+def get_cart(request):
+    c = request.session['cart']
+    c_value = round(sum(i['total_price'] for i in request.session['cart']), 2)
 
     return render(
-        request,
-        "orders/order.html",
-        {'form': form, 'cart': c, 'c_value': c_value})
+        request, "orders/cart.html", {'cart': c, 'c_value': c_value})
 
 
 def load_meals(request):
     meal_type_id = request.GET.get('id_type')
     try:
-        meals = Meal.objects.filter(type=meal_type_id)
+        meals = Meal.objects.filter(type = meal_type_id)
     except ValueError:
         return render(request, "orders/meals_options.html")
 
     try:
-        desc = MealType.objects.filter(id=meal_type_id).first().description
+        desc = MealType.objects.filter(id = meal_type_id).first().description
     except ValueError:
         return render(request, "orders/meals_options.html")
 
@@ -125,7 +131,7 @@ def load_meals(request):
 
 def load_ingredients(request):
     meal_id = request.GET.get('id_meal')
-    meal = Meal.objects.filter(id=meal_id).first()
+    meal = Meal.objects.filter(id = meal_id).first()
     num_of_toppings = meal.num_of_toppings
     toppings = meal.available_toppings.values()
 
@@ -139,10 +145,10 @@ def load_ingredients(request):
         request, "orders/ingredients_options.html",
         {'toppings': toppings,
          'num_of_toppings': num_of_toppings,
-         'toppings_range': range(1, num_of_toppings+1),
+         'toppings_range': range(1, num_of_toppings + 1),
          'extras': extras,
          'num_of_extras': num_of_extras,
-         'extras_range': range(1, num_of_extras+1),
+         'extras_range': range(1, num_of_extras + 1),
          'extras_price': extras_price,
          'is_special': is_special
          })
