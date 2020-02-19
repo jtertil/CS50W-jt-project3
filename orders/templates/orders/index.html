@@ -9,7 +9,7 @@
 {% for type in m_group %}
   <h4>{{ type.grouper }} menu:</h4>
     <ul>
-        {% for el in type.list|dictsort:"price" %}
+        {% for el in type.list %}
           <li>{{ el }}</li>
         {% endfor %}
     </ul>

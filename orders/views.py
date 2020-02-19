@@ -8,7 +8,8 @@ from .forms import MealSelectForm, UserRegistrationForm, UserLoginForm
 
 
 def index(request):
-    m = Meal.objects.select_related('type', 'size').all()
+    m = Meal.objects.select_related('type', 'size').order_by(
+        'type', 'size', 'price')
 
     return render(request, 'orders/index.html', {'m': m})
 
