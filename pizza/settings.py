@@ -101,6 +101,26 @@ DATABASES = {
     }
 }
 
+# Cache, Redis
+# https://docs.djangoproject.com/en/2.2/topics/http/sessions/#using-cached-sessions
+# https://realpython.com/caching-in-django-with-redis/
+# https://niwinz.github.io/django-redis/latest/
+
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient"
+        },
+        "KEY_PREFIX": "orders-app"
+    }
+}
+
+# Cache time to live is 15 minutes.
+CACHE_TTL = 60 * 15
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/2.0/ref/settings/#auth-password-validators
@@ -143,6 +163,9 @@ STATIC_URL = '/static/'
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
+
+# Django debug toolbar
+# https://django-debug-toolbar.readthedocs.io/en/latest/
 
 DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.versions.VersionsPanel',

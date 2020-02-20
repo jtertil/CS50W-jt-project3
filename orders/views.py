@@ -1,12 +1,18 @@
+from django.conf import settings
 from django.contrib.auth import authenticate, login, logout
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.cache import cache_page
 
-from .models import Meal, MealType
 from .forms import MealSelectForm, UserRegistrationForm, UserLoginForm
+from .models import Meal, MealType
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
+@cache_page(CACHE_TTL)
 def index(request):
     m = Meal.objects.select_related('type', 'size').order_by(
         'type', 'size', 'price')
@@ -60,8 +66,8 @@ def order(request):
     # request.session['cart'] = []
     form = MealSelectForm(request.POST)
 
-    if not form.is_valid():
-        print(form.errors)
+    # if not form.is_valid():
+    #     print(form.errors)
 
     if request.method == 'POST' and form.is_valid():
         add_to_cart(request, form)
@@ -101,7 +107,7 @@ def add_to_cart(request, form):
         'total_price':
             float(fcd['meal'].calculate_total_price(len(fcd['extras'])))
     }
-
+    print(ordered_meal)
     cart.append(ordered_meal)
 
 
