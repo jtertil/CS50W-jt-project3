@@ -1,9 +1,13 @@
-## CS50W2019 Project 3
+## CS50W2019 Project 3 [Work in progress]
 
 ### About:
-This is ongoing project. This is ongoing project. I will build an web application for handling a pizza restaurant’s online orders. Users will be able to browse the restaurant’s menu, add items to their cart, and submit their orders. Meanwhile, the restaurant owners will be able to add and update menu items, and view orders that have been placed.
+This is ongoing project. I will build an web application for handling a pizza restaurant’s online orders. Users will be able to browse the restaurant’s menu, add items to their cart, and submit their orders. Meanwhile, the restaurant owners will be able to add and update menu items, and view orders that have been placed.
 
 #### Technologies used:
+ * Python 3: Django 2.2, [django-debug-toolbar](https://github.com/jazzband/django-debug-toolbar)
+ * PostgreSQL 10
+ * JavaScript, Bootstrap, jQuery,
+
 
 ### Project milestones:
 - [x] Complete the Menu, Adding Items, and Registration/Login/Logout steps.
@@ -22,7 +26,7 @@ This is ongoing project. This is ongoing project. I will build an web applicatio
 
 
 ### How it works:
-Work in progress.
+It doesn't work at this time. But I'll take care of it ASAP. :)
 
 ### How it looks: 
 No front-end at this stage. But I got an idea that it should be somewhat closer to this: 
@@ -31,4 +35,4 @@ No front-end at this stage. But I got an idea that it should be somewhat closer 
 rather than this: 
 ![pakistan bus](https://i.ytimg.com/vi/v1uQP40wg7w/maxresdefault.jpg) 
 
-###:)
+:)
