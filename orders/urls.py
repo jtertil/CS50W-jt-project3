@@ -9,6 +9,7 @@ urlpatterns = [
     path("logout", views.logout_view, name="logout"),
     path("register", views.register, name="register"),
     path("order", views.order, name="order"),
+    path("cookies-check", views.cookies_check, name="cookies_check"),
     path('ajax/load-meals/', views.load_meals, name='ajax_load_meals'),
     path('ajax/load-ingredients/', views.load_ingredients, name='ajax_load_ingredients'),
     path('ajax/get-cart/', views.get_cart, name='ajax_get_cart'),

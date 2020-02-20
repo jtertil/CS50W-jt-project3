@@ -152,3 +152,12 @@ def load_ingredients(request):
          'extras_price': extras_price,
          'is_special': is_special
          })
+
+
+def cookies_check(request):
+    if request.session.test_cookie_worked():
+        request.session.delete_test_cookie()
+        return HttpResponse('all good, I ate all cookies')
+    else:
+        request.session.set_test_cookie()
+        return HttpResponse('no cookies here :( refresh and check again...')
