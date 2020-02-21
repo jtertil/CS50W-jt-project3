@@ -1,66 +1,65 @@
-# from django.conf import settings
-# from django.contrib.auth import authenticate, login, logout
-# from django.core.cache.backends.base import DEFAULT_TIMEOUT
-# from django.http import HttpResponse, HttpResponseRedirect
+from django.conf import settings
+from django.contrib.auth import login, logout, authenticate
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
-# from django.urls import reverse
-# from django.views.decorators.cache import cache_page
-#
-# from .forms import MealSelectForm, UserRegistrationForm, UserLoginForm
+from django.urls import reverse
+from django.views.decorators.cache import cache_page
+
+from .forms import UserRegistrationForm, UserLoginForm
 from .models import Item
-#
-# CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
-#
+
+CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
-# @cache_page(CACHE_TTL)
+@cache_page(CACHE_TTL)
 def index(request):
     m = Item.objects.select_related('type', 'size').order_by(
         'type', 'size', 'base_price')
 
     return render(request, 'orders/index.html', {'m': m})
-#
-#
-# def user(request):
-#     if request.user.is_authenticated:
-#         return HttpResponse(f'authenticated: {request.user}')
-#     else:
-#         return HttpResponse('unauthenticated')
-#
-#
-# def login_view(request):
-#     if request.method == 'POST':
-#         form = UserLoginForm(request = request, data = request.POST)
-#         if form.is_valid():
-#             username = form.cleaned_data.get('username')
-#             password = form.cleaned_data.get('password')
-#             user = authenticate(username = username, password = password)
-#             if user:
-#                 login(request, user)
-#                 return HttpResponseRedirect(reverse("user"))
-#         else:
-#             return render(request, "orders/login.html", {'form': form})
-#     else:
-#         form = UserLoginForm
-#         return render(request, "orders/login.html", {'form': form})
-#
-#
-# def logout_view(request):
-#     logout(request)
-#     return HttpResponseRedirect(reverse("user"))
-#
-#
-# def register(request):
-#     if request.method == 'POST':
-#         form = UserRegistrationForm(request.POST)
-#         if form.is_valid():
-#             user = form.save()
-#             login(request, user)
-#             return HttpResponseRedirect(reverse("user"))
-#         else:
-#             return render(request, "orders/register.html", {'form': form})
-#     form = UserRegistrationForm
-#     return render(request, "orders/register.html", {'form': form})
+
+
+def user(request):
+    if request.user.is_authenticated:
+        return HttpResponse(f'authenticated: {request.user}')
+    else:
+        return HttpResponse('unauthenticated')
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = UserLoginForm(request=request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user:
+                login(request, user)
+                return HttpResponseRedirect(reverse("user"))
+        else:
+            return render(request, "orders/login.html", {'form': form})
+    else:
+        form = UserLoginForm
+        return render(request, "orders/login.html", {'form': form})
+
+
+def logout_view(request):
+    logout(request)
+    return HttpResponseRedirect(reverse("user"))
+
+
+def register(request):
+    if request.method == 'POST':
+        form = UserRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return HttpResponseRedirect(reverse("user"))
+        else:
+            return render(request, "orders/register.html", {'form': form})
+    form = UserRegistrationForm
+    return render(request, "orders/register.html", {'form': form})
 #
 #
 # def order(request):
@@ -160,12 +159,12 @@ def index(request):
 #          'extras_price': extras_price,
 #          'is_special': is_special
 #          })
-#
-#
-# def cookies_check(request):
-#     if request.session.test_cookie_worked():
-#         request.session.delete_test_cookie()
-#         return HttpResponse('all good, I ate all cookies')
-#     else:
-#         request.session.set_test_cookie()
-#         return HttpResponse('no cookies here :( refresh and check again...')
+
+
+def cookies_check(request):
+    if request.session.test_cookie_worked():
+        request.session.delete_test_cookie()
+        return HttpResponse('all good, I ate all cookies')
+    else:
+        request.session.set_test_cookie()
+        return HttpResponse('no cookies here :( refresh and check again...')
