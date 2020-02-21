@@ -1,24 +1,21 @@
 from django.contrib import admin
 from django.contrib.auth.models import Group
 
-from .models import MealSize, MealType, Meal, Ingredient
+from .forms import ExtraAdminForm
+from .models import Size, Type, Extra, Item
 
 
-class MealAdmin(admin.ModelAdmin):
-    filter_horizontal = ('available_toppings', 'available_extras')
-    list_display = ('name', 'type', 'price', 'is_special')
-    list_filter = ('type', 'size',)
-    list_select_related = ('type', 'size')
+class ItemAdmin(admin.ModelAdmin):
+    filter_horizontal = ('extras_available', )
+
+
+class ExtraAdmin(admin.ModelAdmin):
+    form = ExtraAdminForm
 
 
 admin.site.site_header = "Pinocchio's Pizza & Subs administration site"
-admin.site.register(Meal, MealAdmin)
-admin.site.register(Ingredient)
-admin.site.register(MealSize)
-admin.site.register(MealType)
+admin.site.register(Item, ItemAdmin)
+admin.site.register(Extra, ExtraAdmin)
+admin.site.register(Size)
+admin.site.register(Type)
 admin.site.unregister(Group)
-
-
-
-
-

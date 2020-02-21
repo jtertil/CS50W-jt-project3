@@ -8,6 +8,7 @@
 <ul>
 {% for type in m_group %}
   <h4>{{ type.grouper }} menu:</h4>
+  <p>{{ type.grouper.description }}</p>
     <ul>
         {% for el in type.list %}
           <li>{{ el }}</li>
