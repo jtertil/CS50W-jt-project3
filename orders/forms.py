@@ -36,6 +36,7 @@ class ExtraAdminForm(forms.ModelForm):
 
         if extra.pk:
             extra.items.set(self.cleaned_data['items'])
+            extra.save()
 
         return extra
 

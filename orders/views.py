@@ -2,22 +2,23 @@
 # from django.contrib.auth import authenticate, login, logout
 # from django.core.cache.backends.base import DEFAULT_TIMEOUT
 # from django.http import HttpResponse, HttpResponseRedirect
-# from django.shortcuts import render
+from django.shortcuts import render
 # from django.urls import reverse
 # from django.views.decorators.cache import cache_page
 #
 # from .forms import MealSelectForm, UserRegistrationForm, UserLoginForm
-# from .models import Meal, MenuItemType
+from .models import Item
 #
 # CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 #
-#
+
+
 # @cache_page(CACHE_TTL)
-# def index(request):
-#     m = Meal.objects.select_related('type', 'size').order_by(
-#         'type', 'size', 'price')
-#
-#     return render(request, 'orders/index.html', {'m': m})
+def index(request):
+    m = Item.objects.select_related('type', 'size').order_by(
+        'type', 'size', 'base_price')
+
+    return render(request, 'orders/index.html', {'m': m})
 #
 #
 # def user(request):
