@@ -1,0 +1,45 @@
+<div class="form-group" id="item-select">
+  <label for="item_id">Please choose your option:</label>
+  <select class="form-control" name="item" id="item_id">
+    <option value="">---------</option>
+    {% for item in items %}
+    <option value="{{ item.pk }}">{{ item }}</option>
+    {% endfor %}
+  </select>
+</div>
+
+{% block scripts %}
+  <script>
+    $("#item_id").change(function () {
+      let ajax_url = $("#add-to-basket").attr("ajax-get-extras");
+      let item_id = $(this).val();
+
+      if (item_id) {
+        $.ajax({
+          url: ajax_url,
+          data: {
+            'item_id': item_id
+          },
+          success: function(data) {
+            $("#extras-select").html(data);
+            $("#extras-select").show();
+            $("#add-basket").prop('disabled', false)
+          }
+        });
+       } else {
+        $("#add-basket").prop('disabled', false)
+        $("#extras-select").hide()
+       }
+
+
+
+    });
+
+    $(document).ready(function() {
+      $('#item_id').select2({ width: '100%' })
+    });
+
+
+
+  </script>
+{% endblock %}

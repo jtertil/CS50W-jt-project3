@@ -1,12 +1,10 @@
-# from django import forms
-# from .models import Meal, Ingredient, MenuItemType
 from django import forms
 from django.contrib.admin.widgets import FilteredSelectMultiple
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 
-from orders.models import Item, Extra
+from orders.models import Item, Extra, Basket, Type
 
 
 # custom form to workaround problem with bidirectional m2m in django admin
@@ -63,24 +61,14 @@ class UserLoginForm(AuthenticationForm):
         fields = ('username', 'password')
 
 
-# class MealSelectForm(forms.ModelForm):
-#     class Meta:
-#         model = Meal
-#         fields = ('type', 'meal', 'extras', 'toppings', 'special_instructions')
-#
-#     type = forms.ModelChoiceField(queryset=MenuItemType.objects.all())
-#     meal = forms.ModelChoiceField(queryset=Meal.objects.all())
-#
-#     extras = forms.ModelMultipleChoiceField(
-#         queryset=Ingredient.objects.all(), required=False)
-#     toppings = forms.ModelMultipleChoiceField(
-#         queryset=Ingredient.objects.all(), required=False)
-#     special_instructions = forms.CharField(
-#         max_length=300, help_text='Special instructions', required=False)
-#
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
-#         self.fields['meal'].widget.attrs = {'style': 'display:none;'}
-#
-#
-#
+class AddToBasketForm(forms.ModelForm):
+    class Meta:
+        model = Basket
+        fields = ('type', 'item', 'extras_selected', 'special_info')
+
+    type = forms.ModelChoiceField(queryset=Type.objects.all())
+    extras_selected = forms.ModelMultipleChoiceField(
+            queryset=Extra.objects.all(), required=False)
+
+    special_info = forms.CharField(required=False)
+

@@ -1,0 +1,42 @@
+{% if extras_max_quantity %}
+<div class="form-group" id="extras-select">
+  {% if extras_max_quantity == 1  %}
+  <label for="id_extras{{ i }}">You can select 1 {{ extras_name }}:</label>
+  {% else %}
+  <label for="id_extras{{ i }}">Select up to {{extras_max_quantity}} {{ extras_name }}s:</label>
+  {% endif %}
+  <select multiple class="form-control extras" name="extras_selected{{ i }}" id="id_extras{{ i }}">
+    {% for extra in extras %}
+    <option value="{{ extra.id }}">{{ extra.name }}</option>
+    {% endfor %}
+  </select>
+  {% if extras_price %}
+  <small>Each one costs: {{ extras_price }}$</small>
+  {% endif %}
+</div>
+<br>
+{% endif %}
+
+{% if is_special %}
+<div class="form-group">
+  <label for="special_info">Any special instructions?</label>
+  <textarea
+          class="form-control"
+          name="special_info"
+          id="special_info"
+          rows="3"></textarea>
+</div>
+{% endif %}
+
+{% block scripts %}
+<script>
+
+  $(document).ready(function() {
+      $('.form-control.extras').select2({
+        maximumSelectionLength : {{ extras_max_quantity }},
+     });
+  });
+
+
+</script>
+{% endblock %}

@@ -3,17 +3,100 @@
 {% block title %}Index{% endblock %}
 
 {% block body %}
-{% regroup m by type as m_group %}
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#order-modal">
+  Eat something!
+</button>
+<!-- Modal -->
+<div class="modal fade" id="order-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-title">Order your meal</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form
+        id="add-to-basket"
+        ajax-get-items="{% url 'ajax_items' %}"
+        ajax-get-extras="{% url 'ajax_extras' %}"
+        method="post">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group" id="type-select">
+            <label for="type_id">What would you like to eat?</label>
+            <select class="form-control" name="type" id="type_id">
+            {% for type in form.type %}
+            {{ type }}
+            {% endfor %}
+            </select>
+          </div>
+          <div class="form-group" id="item-select"></div>
+          <div class="form-group" id="extras-select"></div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" id="add-basket" disabled>Add to basket</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
 
-<ul>
-{% for type in m_group %}
-  <h4>{{ type.grouper }} menu:</h4>
-  <p>{{ type.grouper.description }}</p>
-    <ul>
-        {% for el in type.list %}
-          <li>{{ el }}</li>
-        {% endfor %}
-    </ul>
-{% endfor %}
-</ul>
+<button id="menu-toggle" type="button" class="btn btn-info">Show menu</button>
+<div id="menu" style="display: none">
+  {% regroup m by type as m_group %}
+  <ul>
+  {% for type in m_group %}
+    <h4>{{ type.grouper }} menu:</h4>
+    <p>{{ type.grouper.description }}</p>
+      <ul>
+          {% for el in type.list %}
+            <li>{{ el }}</li>
+          {% endfor %}
+      </ul>
+  {% endfor %}
+  </ul>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+
+$(document).ready(function() {
+    $("#menu-toggle").click(function(){
+      $("#menu").toggle();
+    });
+    $('#type_id').select2({ width: '100%' })
+});
+
+
+
+$("#type_id").change(function () {
+
+    let ajax_url = $("#add-to-basket").attr("ajax-get-items");
+    let type_id = $(this).val();
+
+    $("#item-select").hide()
+
+    if (type_id) {
+      $.ajax({
+        url: ajax_url,
+        data: {
+          'type_id': type_id
+        },
+        success: function(data) {
+          $("#extras-select").hide()
+          $("#item-select").html(data);
+          $("#item-select").show()
+        }
+      });
+     } else {
+      $("#item-select").hide()
+      $("#extras-select").hide()
+      }
+    });
+
+</script>
 {% endblock %}
