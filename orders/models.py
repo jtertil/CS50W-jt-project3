@@ -53,4 +53,4 @@ class Basket(models.Model):
     special_info = models.TextField(max_length=300, null=True, blank=True,)
 
     price = models.DecimalField(
-        max_digits = 6, decimal_places = 2)
+        max_digits=6, decimal_places=2)

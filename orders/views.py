@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.urls import reverse
 
 from .forms import UserRegistrationForm, UserLoginForm, AddToBasketForm
-from .models import Item
+from .models import Item, Basket
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
@@ -20,8 +20,20 @@ def index(request):
 
     if request.method == 'POST':
         if form.is_valid():
-            print(form.cleaned_data)
+            fcd = form.cleaned_data
             # TODO add user info and calculated price and save into db
+            price = fcd['item'].base_price + (fcd['item'].extras_price * len(form.cleaned_data['extras_selected']))
+
+            basket = Basket(
+                user=request.user,
+                item=fcd['item'],
+                special_info=fcd['special_info'],
+                price=price
+            )
+            basket.save()
+            basket.extras_selected.set(form.cleaned_data['extras_selected'])
+            basket.save()
+
         else:
             print(form.errors)
 
