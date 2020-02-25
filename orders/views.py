@@ -16,28 +16,40 @@ def index(request):
 
     m = Item.objects.select_related('type', 'size').order_by(
         'type', 'size', 'base_price')
-    form = AddToBasketForm(request.POST)
 
-    if request.method == 'POST':
-        if form.is_valid():
-            fcd = form.cleaned_data
-            # TODO add user info and calculated price and save into db
-            price = fcd['item'].base_price + (fcd['item'].extras_price * len(form.cleaned_data['extras_selected']))
+    if request.user.is_authenticated:
+        form = AddToBasketForm(request.POST)
+        basket = Basket.objects.filter(user = request.user)
+        if request.method == 'POST':
+            if form.is_valid():
+                fcd = form.cleaned_data
+                bp = fcd['item'].base_price
+                ep = fcd['item'].extras_price
+                eq = len(form.cleaned_data['extras_selected'])
 
-            basket = Basket(
-                user=request.user,
-                item=fcd['item'],
-                special_info=fcd['special_info'],
-                price=price
-            )
-            basket.save()
-            basket.extras_selected.set(form.cleaned_data['extras_selected'])
-            basket.save()
+                price = bp + (ep * eq) if ep and eq else bp
 
-        else:
-            print(form.errors)
+                basket = Basket(
+                    user=request.user,
+                    item=fcd['item'],
+                    special_info=fcd['special_info'],
+                    price=price
+                )
+                basket.save()
+                basket.extras_selected.set(form.cleaned_data['extras_selected'])
+                basket.save()
 
-    return render(request, 'orders/index.html', {'m': m, 'form': form})
+            else:
+                print(form.errors)
+
+        return render(request, 'orders/index.html', {'m': m, 'form': form, 'basket': basket})
+
+    return render(request, 'orders/index.html', {'m': m,})
+
+
+# def get_basket(request):
+#     basket = Basket.objects.filter(user=request.user)
+#     return basket
 
 
 def get_items(request):

@@ -3,6 +3,29 @@
 {% block title %}Index{% endblock %}
 
 {% block body %}
+<div id="user-info">
+  <h2>Currnt user: {{ user }}</h2>
+</div>
+
+{% if basket %}
+<div id="basket">
+{% for item in basket %}
+  <p>{{ item.item.name }}
+    {% if item.extras_selected.all %}
+    (
+    {% for ex in item.extras_selected.all %}
+    {% if forloop.last %}
+    {{ ex }} )
+    {% else %}
+    {{ ex }},
+    {% endif %}
+    {% endfor %}
+    {% endif %}
+    - {{ item.price }}$ </p>
+{% endfor %}
+</div>
+{% endif %}
+
 <!-- Button trigger modal -->
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#order-modal">
   Eat something!
@@ -59,6 +82,8 @@
   {% endfor %}
   </ul>
 </div>
+
+
 {% endblock %}
 
 {% block scripts %}
