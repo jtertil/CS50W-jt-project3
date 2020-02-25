@@ -1,9 +1,11 @@
 from django.conf import settings
 from django.contrib.auth import login, logout, authenticate
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
+from django.core.cache import cache
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.views.decorators.cache import cache_page
 
 from .forms import UserRegistrationForm, UserLoginForm, AddToBasketForm
 from .models import Item, Basket
@@ -11,24 +13,17 @@ from .models import Item, Basket
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
-# @cache_page(CACHE_TTL)
 def index(request):
-
-    m = Item.objects.select_related('type', 'size').order_by(
-        'type', 'size', 'base_price')
-
+    menu = get_all_items().order_by('type', 'size', 'base_price')
     if request.user.is_authenticated:
         form = AddToBasketForm(request.POST)
-        basket = Basket.objects.filter(user = request.user)
         if request.method == 'POST':
             if form.is_valid():
                 fcd = form.cleaned_data
                 bp = fcd['item'].base_price
                 ep = fcd['item'].extras_price
                 eq = len(form.cleaned_data['extras_selected'])
-
                 price = bp + (ep * eq) if ep and eq else bp
-
                 basket = Basket(
                     user=request.user,
                     item=fcd['item'],
@@ -38,24 +33,34 @@ def index(request):
                 basket.save()
                 basket.extras_selected.set(form.cleaned_data['extras_selected'])
                 basket.save()
-
             else:
                 print(form.errors)
-
-        return render(request, 'orders/index.html', {'m': m, 'form': form, 'basket': basket})
-
-    return render(request, 'orders/index.html', {'m': m,})
-
-
-# def get_basket(request):
-#     basket = Basket.objects.filter(user=request.user)
-#     return basket
+        return render(request, 'orders/index.html', {'menu': menu, 'form': form, 'basket': get_basket(request)})
+    else:
+        return render(request, 'orders/index.html', {'menu': menu})
 
 
-def get_items(request):
+def get_basket(request):
+    q = Basket.objects.select_related('item').filter(user=request.user)
+    basket_items = [i.as_dict() for i in q]
+    return basket_items
+
+
+def get_all_items():
+    if cache.get('items'):
+        print('items from cache')
+        return cache.get('items')
+    else:
+        items = Item.objects.select_related('type', 'size').all()
+        cache.set('items', items, CACHE_TTL)
+        print('items from db')
+    return items
+
+
+def get_item(request):
     type_id = request.GET.get('type_id')
     try:
-        items = Item.objects.filter(type=type_id)
+        items = get_all_items().filter(type=type_id)
     except ValueError:
         return render(request, "orders/items_options.html")
 
@@ -64,10 +69,8 @@ def get_items(request):
 
 
 def get_extras(request):
-
     item_id = request.GET.get('item_id')
-    item = Item.objects.filter(id = item_id).select_related('type').first()
-
+    item = get_all_items().filter(id=item_id).first()
     extras = item.extras_available.values()
     extras_name = item.type.extras_name
     extras_max_quantity = item.extras_max_quantity

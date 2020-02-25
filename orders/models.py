@@ -26,6 +26,7 @@ class Type(models.Model):
 
 
 class Item(models.Model):
+
     name = models.CharField(max_length=100)
     type = models.ForeignKey(
         Type, on_delete=models.CASCADE)
@@ -55,3 +56,14 @@ class Basket(models.Model):
     price = models.DecimalField(
         max_digits=6, decimal_places=2)
 
+    def as_dict(self):
+        return {
+            'id': self.pk,
+            'item': self.item.name,
+            'extras_name': self.item.type.extras_name,
+            'extras_selected': [e.name for e in self.extras_selected.all()],
+            'price': self.price
+        }
+
+    def __str__(self):
+        return f'{self.item.name} - {self.price}$'

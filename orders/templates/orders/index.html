@@ -4,16 +4,17 @@
 
 {% block body %}
 <div id="user-info">
-  <h2>Currnt user: {{ user }}</h2>
+  <h2>Current user: {{ user }}</h2>
 </div>
 
 {% if basket %}
 <div id="basket">
-{% for item in basket %}
-  <p>{{ item.item.name }}
-    {% if item.extras_selected.all %}
+
+{% for dish in basket %}
+  <p>{{ dish.item }}
+    {% if dish.extras_selected %}
     (
-    {% for ex in item.extras_selected.all %}
+    {% for ex in dish.extras_selected %}
     {% if forloop.last %}
     {{ ex }} )
     {% else %}
@@ -21,8 +22,9 @@
     {% endif %}
     {% endfor %}
     {% endif %}
-    - {{ item.price }}$ </p>
+    - {{ dish.price }}$ </p>
 {% endfor %}
+
 </div>
 {% endif %}
 
@@ -69,7 +71,7 @@
 
 <button id="menu-toggle" type="button" class="btn btn-info">Show menu</button>
 <div id="menu" style="display: none">
-  {% regroup m by type as m_group %}
+  {% regroup menu by type as m_group %}
   <ul>
   {% for type in m_group %}
     <h4>{{ type.grouper }} menu:</h4>
@@ -82,8 +84,6 @@
   {% endfor %}
   </ul>
 </div>
-
-
 {% endblock %}
 
 {% block scripts %}
