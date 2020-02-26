@@ -22,7 +22,7 @@
     {% endif %}
     {% endfor %}
     {% endif %}
-    - {{ dish.price }}$ </p>
+    - {{ dish.price }}$ <a href='{% url "delete_basket_item" id=dish.id %}'>(delete)</a></p>
 {% endfor %}
 
 </div>
