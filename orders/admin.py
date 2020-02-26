@@ -13,10 +13,15 @@ class ExtraAdmin(admin.ModelAdmin):
     form = ExtraAdminForm
 
 
+class BasketAdmin(admin.ModelAdmin):
+    list_display = ('item', 'user')
+    list_filter = ('user',)
+
+
 admin.site.site_header = "Pinocchio's Pizza & Subs administration site"
 admin.site.register(Item, ItemAdmin)
 admin.site.register(Extra, ExtraAdmin)
 admin.site.register(Size)
 admin.site.register(Type)
-admin.site.register(Basket)
+admin.site.register(Basket, BasketAdmin)
 admin.site.unregister(Group)
