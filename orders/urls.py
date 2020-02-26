@@ -9,8 +9,8 @@ urlpatterns = [
     path("logout", views.logout_view, name="logout"),
     path("register", views.register, name="register"),
     path("cookies-check", views.cookies_check, name="cookies_check"),
-    path('ajax/items/', views.get_item, name= 'ajax_items'),
-    path('ajax/extras/', views.get_extras, name='ajax_extras'),
+    path('ajax/items/', views.get_item_options, name= 'ajax_items'),
+    path('ajax/extras/', views.get_extras_options, name= 'ajax_extras'),
 
 
 ]

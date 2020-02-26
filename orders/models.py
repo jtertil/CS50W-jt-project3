@@ -46,6 +46,9 @@ class Item(models.Model):
 
 
 class Basket(models.Model):
+    class Meta:
+        indexes = [models.Index(fields = ['user'])]
+
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # on_delete?
     item = models.ForeignKey(Item, on_delete=models.CASCADE)  # on_delete?
     extras_selected = models.ManyToManyField(

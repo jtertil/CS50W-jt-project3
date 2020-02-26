@@ -14,8 +14,9 @@ CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
 
 def index(request):
-    menu = get_all_items().order_by('type', 'size', 'base_price')
+    menu = get_all_items()
     if request.user.is_authenticated:
+
         form = AddToBasketForm(request.POST)
         if request.method == 'POST':
             if form.is_valid():
@@ -33,44 +34,69 @@ def index(request):
                 basket.save()
                 basket.extras_selected.set(form.cleaned_data['extras_selected'])
                 basket.save()
+
             else:
                 print(form.errors)
-        return render(request, 'orders/index.html', {'menu': menu, 'form': form, 'basket': get_basket(request)})
+
+        return render(request, 'orders/index.html', {'menu': menu, 'form': form, 'basket_items': get_basket_items(request)})
     else:
         return render(request, 'orders/index.html', {'menu': menu})
 
 
-def get_basket(request):
-    q = Basket.objects.select_related('item').filter(user=request.user)
-    basket_items = [i.as_dict() for i in q]
-    return basket_items
-
-
-def get_all_items():
-    if cache.get('items'):
-        print('items from cache')
-        return cache.get('items')
+def get_basket_items(request):
+    q = Basket.objects.prefetch_related('item', 'item__type', 'extras_selected').filter(
+        user=request.user)
+    if q:
+        basket_items = [i.as_dict() for i in q]
+        return basket_items
     else:
-        items = Item.objects.select_related('type', 'size').all()
-        cache.set('items', items, CACHE_TTL)
-        print('items from db')
-    return items
+        return None
 
 
-def get_item(request):
+def get_all_items(**kwargs):
+    # TODO refactoring need - how to deal with multiple kwargs
+
+    if kwargs:
+        k, v = kwargs.popitem()  # takes only last kwargs
+        if cache.get(f'{k}:{v}'):
+            items = cache.get(f'{k}:{v}')
+            print(f'item {k}:{v} cache query')
+            return items
+        else:
+            items = list(
+                Item.objects.select_related(
+                    'type', 'size').filter(**{k: v}))
+            cache.set(f'{k}:{v}', items, CACHE_TTL)
+            print(f'item {k}:{v} db query')
+            return items
+    else:
+        if cache.get('items'):
+            print('items all cache query')
+            return cache.get('items')
+        else:
+            items = list(
+                Item.objects.select_related(
+                    'type', 'size').all().order_by(
+                    'type', 'size', 'base_price'))
+            cache.set('items', items, CACHE_TTL)
+            print('items all db query')
+            return items
+
+
+def get_item_options(request):
     type_id = request.GET.get('type_id')
     try:
-        items = get_all_items().filter(type=type_id)
+        items = get_all_items(type=type_id)
     except ValueError:
         return render(request, "orders/items_options.html")
-
     return render(
         request, "orders/items_options.html", {'items': items})
 
 
-def get_extras(request):
+def get_extras_options(request):
     item_id = request.GET.get('item_id')
-    item = get_all_items().filter(id=item_id).first()
+    item = get_all_items(id=item_id)[0]
+
     extras = item.extras_available.values()
     extras_name = item.type.extras_name
     extras_max_quantity = item.extras_max_quantity
