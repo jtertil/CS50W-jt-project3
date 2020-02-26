@@ -14,7 +14,7 @@ class ExtraAdmin(admin.ModelAdmin):
 
 
 class BasketAdmin(admin.ModelAdmin):
-    list_display = ('item', 'user')
+    list_display = ('id', 'item', 'user')
     list_filter = ('user',)
 
 

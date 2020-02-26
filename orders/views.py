@@ -1,11 +1,11 @@
 from django.conf import settings
 from django.contrib.auth import login, logout, authenticate
-from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.core.cache import cache
+from django.core.cache.backends.base import DEFAULT_TIMEOUT
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
-from django.views.decorators.cache import cache_page
 
 from .forms import UserRegistrationForm, UserLoginForm, AddToBasketForm
 from .models import Item, Basket
@@ -43,6 +43,7 @@ def index(request):
         return render(request, 'orders/index.html', {'menu': menu})
 
 
+# TODO login only
 def get_basket_items(request):
     q = Basket.objects.prefetch_related('item', 'item__type', 'extras_selected').filter(
         user=request.user)
@@ -53,6 +54,17 @@ def get_basket_items(request):
         return None
 
 
+# TODO login only
+def delete_basket_item(request, id):
+    q = get_object_or_404(Basket, pk=id)
+    if q.user == request.user:
+        q.delete()
+        return HttpResponseRedirect(reverse("index"))
+    else:
+        raise PermissionDenied
+
+
+# TODO login only
 def get_all_items(**kwargs):
     # TODO refactoring need - how to deal with multiple kwargs
 
@@ -83,6 +95,7 @@ def get_all_items(**kwargs):
             return items
 
 
+# TODO login only
 def get_item_options(request):
     type_id = request.GET.get('type_id')
     try:
@@ -93,6 +106,7 @@ def get_item_options(request):
         request, "orders/items_options.html", {'items': items})
 
 
+# TODO login only
 def get_extras_options(request):
     item_id = request.GET.get('item_id')
     item = get_all_items(id=item_id)[0]
@@ -113,6 +127,7 @@ def get_extras_options(request):
          })
 
 
+# TODO don't need this anymore
 def user(request):
     if request.user.is_authenticated:
         return HttpResponse(f'authenticated: {request.user}')
@@ -137,6 +152,7 @@ def login_view(request):
         return render(request, "orders/login.html", {'form': form})
 
 
+# TODO login only
 def logout_view(request):
     logout(request)
     return HttpResponseRedirect(reverse("user"))
