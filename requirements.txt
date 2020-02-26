@@ -1,6 +1,6 @@
 backcall==0.1.0
 decorator==4.4.1
-Django==2.2.9
+Django==2.2.10
 django-debug-toolbar==2.1
 django-redis==4.11.0
 django-widget-tweaks==1.4.5
