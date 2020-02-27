@@ -1,3 +1,4 @@
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -35,11 +36,12 @@ class Item(models.Model):
     extras_available = models.ManyToManyField(
         Extra, blank=True, related_name='items', symmetrical=False)
     extras_price = models.DecimalField(
-        max_digits=6, decimal_places=2, default=0)
+        max_digits=6, decimal_places=2, default=0,
+        validators=[MinValueValidator(0)])
     is_special = models.BooleanField(default=False)
     extras_max_quantity = models.PositiveIntegerField(default=0)
     base_price = models.DecimalField(
-        max_digits=6, decimal_places=2)
+        max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
 
     def __str__(self):
         return f'{self.name} - {self.base_price}$'
@@ -57,7 +59,7 @@ class Basket(models.Model):
     special_info = models.TextField(max_length=300, null=True, blank=True,)
 
     price = models.DecimalField(
-        max_digits=6, decimal_places=2)
+        max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
 
     def as_dict(self):
         return {

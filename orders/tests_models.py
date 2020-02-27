@@ -3,7 +3,7 @@ import unittest
 from django.db.utils import DataError
 from django.test import TestCase
 
-from orders.models import Size, Extra, Type, Item
+from orders.models import Size, Extra, Type, Item, User
 
 
 class SizeTest(TestCase):
@@ -92,3 +92,55 @@ class TypeTest(TestCase):
                           extras_name=self.extras_name_toolong
                           )
 
+
+class ItemTest(TestCase):
+    def setUp(self) -> None:
+        User.objects.create_user(
+            username='test_user',
+            password='idontcare!',
+            email='test_user@email.com',
+            first_name='Fist_name',
+            last_name='Last_name'
+            )
+
+        Type.objects.create(name='test_type')
+        Size.objects.create(name='test_size')
+        for num in range(1, 10):
+            Extra.objects.create(name=f'test_extra_{num}')
+
+        self.name_valid = 'i' * Item._meta.get_field('name').max_length
+        self.name_toolong = self.name_valid + 'i'
+        self.type_valid = Type.objects.filter(name='test_type').first()
+        self.type_invalid = Type.objects.filter(name='invalid').first()
+        self.size_valid = Size.objects.filter(name='test_size').first()
+        self.size_invalid = Size.objects.filter(name='invalid').first()
+        self.extras_price_valid = 0.5
+        self.extras_price_negative = -1
+        self.base_price_valid = 12.7
+        self.base_price_negative = -100
+
+        self.default_extras_price = Item._meta.get_field(
+            'extras_price').default
+        self.default_is_special = Item._meta.get_field(
+            'is_special').default
+        self.default_extras_max_quantity = Item._meta.get_field(
+            'extras_max_quantity').default
+
+    def test_create_item_with_valid_data(self):
+        i = Item.objects.create(
+            name=self.name_valid,
+            type=self.type_valid,
+            size=self.size_valid,
+            base_price=self.base_price_valid
+        )
+
+        self.assertTrue(isinstance(i, Item))
+        self.assertEqual(
+            i.__str__(), f'{self.name_valid} - {self.base_price_valid}$')
+        self.assertEqual(i.name, self.name_valid)
+        self.assertEqual(i.type, self.type_valid)
+        self.assertEqual(i.size, self.size_valid)
+        self.assertEqual(i.extras_price, self.default_extras_price)
+        self.assertEqual(i.is_special, self.default_is_special)
+        self.assertEqual(
+            i.extras_max_quantity, self.default_extras_max_quantity)
