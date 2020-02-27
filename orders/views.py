@@ -23,7 +23,7 @@ def index(request):
                 fcd = form.cleaned_data
                 bp = fcd['item'].base_price
                 ep = fcd['item'].extras_price
-                eq = len(form.cleaned_data['extras_selected'])
+                eq = len(fcd['extras_selected'])
                 price = bp + (ep * eq) if ep and eq else bp
                 basket = Basket(
                     user=request.user,
@@ -32,21 +32,26 @@ def index(request):
                     price=price
                 )
                 basket.save()
-                basket.extras_selected.set(form.cleaned_data['extras_selected'])
+                basket.extras_selected.set(fcd['extras_selected'])
                 basket.save()
 
             else:
                 print(form.errors)
 
-        return render(request, 'orders/index.html', {'menu': menu, 'form': form, 'basket_items': get_basket_items(request)})
+        return render(
+            request,
+            'orders/index.html',
+            {'menu': menu,
+             'form': form,
+             'basket_items': get_basket_items(request)})
     else:
         return render(request, 'orders/index.html', {'menu': menu})
 
 
 # TODO login only
 def get_basket_items(request):
-    q = Basket.objects.prefetch_related('item', 'item__type', 'extras_selected').filter(
-        user=request.user)
+    q = Basket.objects.prefetch_related(
+        'item', 'item__type', 'extras_selected').filter(user=request.user)
     if q:
         basket_items = [i.as_dict() for i in q]
         return basket_items
