@@ -5,8 +5,8 @@ This is ongoing project. I will build an web application for handling a pizza re
 
 #### Technologies used:
  * Python 3: Django 2.2, [django-debug-toolbar](https://github.com/jazzband/django-debug-toolbar), [django-redis](https://niwinz.github.io/django-redis/latest/)
- * PostgreSQL 10
- * Redis
+ * PostgreSQL 10, Redis
+ * Unittest, Coverage
  * JavaScript, Bootstrap, jQuery,
 
 
