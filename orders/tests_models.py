@@ -95,16 +95,10 @@ class TypeTest(TestCase):
 
 class ItemTest(TestCase):
     def setUp(self) -> None:
-        User.objects.create_user(
-            username='test_user',
-            password='idontcare!',
-            email='test_user@email.com',
-            first_name='Fist_name',
-            last_name='Last_name'
-            )
 
         Type.objects.create(name='test_type')
         Size.objects.create(name='test_size')
+
         for num in range(1, 11):
             Extra.objects.create(name=f'test_extra_{num}')
 
@@ -196,3 +190,57 @@ class ItemTest(TestCase):
                           )
 
 
+class BasketTest(TestCase):
+    def setUp(self) -> None:
+        User.objects.create_user(
+            username='test_user',
+            password='idontcare!',
+            email='test_user@email.com',
+            first_name='Fist_name',
+            last_name='Last_name'
+        )
+
+        Type.objects.create(name='test_type')
+        Size.objects.create(name='test_size')
+
+        for num in range(1, 11):
+            Extra.objects.create(name=f'test_extra_{num}')
+
+        name = 'test_item_name'
+        type = Type.objects.first()
+        size = Size.objects.first()
+        extras_available = Extra.objects.all()[:4]
+        extras_price = 0.5
+        is_special = True
+        extras_max_quantity = 2
+        base_price = 10
+
+        Item.objejects.create(
+            name=name,
+            type=type,
+            size=size,
+            extras_available=extras_available,
+            extras_price=extras_price,
+            is_special=is_special,
+            extras_max_quantity=extras_max_quantity,
+            base_price=base_price
+        )
+
+
+        self.name_valid = 'i' * Item._meta.get_field('name').max_length
+        self.name_toolong = self.name_valid + 'i'
+        self.type_valid = Type.objects.filter(name='test_type').first()
+        self.type_as_string = 'type_as_string'
+        self.size_valid = Size.objects.filter(name='test_size').first()
+        self.size_as_string = 'size_as_string'
+        self.extras_price_valid = '0.5'
+        self.extras_price_negative = '-1'
+        self.base_price_valid = '12.7'
+        self.base_price_negative = '-100'
+
+        self.default_extras_price = Item._meta.get_field(
+            'extras_price').default
+        self.default_is_special = Item._meta.get_field(
+            'is_special').default
+        self.default_extras_max_quantity = Item._meta.get_field(
+            'extras_max_quantity').default

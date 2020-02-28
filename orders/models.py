@@ -61,7 +61,7 @@ class Item(models.Model):
 
 class Basket(models.Model):
     class Meta:
-        indexes = [models.Index(fields = ['user'])]
+        indexes = [models.Index(fields=['user'])]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # on_delete?
     item = models.ForeignKey(Item, on_delete=models.CASCADE)  # on_delete?
@@ -73,6 +73,15 @@ class Basket(models.Model):
     price = models.DecimalField(
         max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
 
+    def __str__(self):
+        return f'{self.item.name} - {self.price}$'
+
+    def save(self, *args, **kwargs):
+        super(Basket, self).save(*args, **kwargs)
+
+        if float(self.price) < 0:
+            raise ValueError(f'Must be a value greater than or equal to 0')
+
     def as_dict(self):
         return {
             'id': self.pk,
@@ -81,6 +90,3 @@ class Basket(models.Model):
             'extras_selected': [e.name for e in self.extras_selected.all()],
             'price': self.price
         }
-
-    def __str__(self):
-        return f'{self.item.name} - {self.price}$'
