@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
@@ -41,10 +43,20 @@ class Item(models.Model):
     is_special = models.BooleanField(default=False)
     extras_max_quantity = models.PositiveIntegerField(default=0)
     base_price = models.DecimalField(
-        max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
+        max_digits=6, decimal_places=2,
+        validators=[MinValueValidator(0)])
 
     def __str__(self):
         return f'{self.name} - {self.base_price}$'
+
+    def save(self, *args, **kwargs):
+        super(Item, self).save(*args, **kwargs)
+
+        if float(self.extras_price) < 0:
+            raise ValueError(f'Must be a value greater than or equal to 0')
+
+        if float(self.base_price) < 0:
+            raise ValueError(f'Must be a value greater than or equal to 0')
 
 
 class Basket(models.Model):

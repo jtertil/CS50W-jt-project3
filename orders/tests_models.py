@@ -105,19 +105,19 @@ class ItemTest(TestCase):
 
         Type.objects.create(name='test_type')
         Size.objects.create(name='test_size')
-        for num in range(1, 10):
+        for num in range(1, 11):
             Extra.objects.create(name=f'test_extra_{num}')
 
         self.name_valid = 'i' * Item._meta.get_field('name').max_length
         self.name_toolong = self.name_valid + 'i'
         self.type_valid = Type.objects.filter(name='test_type').first()
-        self.type_invalid = Type.objects.filter(name='invalid').first()
+        self.type_as_string = 'type_as_string'
         self.size_valid = Size.objects.filter(name='test_size').first()
-        self.size_invalid = Size.objects.filter(name='invalid').first()
-        self.extras_price_valid = 0.5
-        self.extras_price_negative = -1
-        self.base_price_valid = 12.7
-        self.base_price_negative = -100
+        self.size_as_string = 'size_as_string'
+        self.extras_price_valid = '0.5'
+        self.extras_price_negative = '-1'
+        self.base_price_valid = '12.7'
+        self.base_price_negative = '-100'
 
         self.default_extras_price = Item._meta.get_field(
             'extras_price').default
@@ -144,3 +144,55 @@ class ItemTest(TestCase):
         self.assertEqual(i.is_special, self.default_is_special)
         self.assertEqual(
             i.extras_max_quantity, self.default_extras_max_quantity)
+
+    def test_create_item_with_valid_data_add_extras(self):
+        i = Item.objects.create(
+            name=self.name_valid,
+            type=self.type_valid,
+            size=self.size_valid,
+            base_price=self.base_price_valid
+        )
+
+        all_extra_obj = Extra.objects.all()
+        i.extras_available.set(all_extra_obj)
+
+        self.assertEqual(all_extra_obj.count(), i.extras_available.count())
+
+    def test_create_item_with_invalid_type(self):
+        i = Item.objects.create
+        self.assertRaises(ValueError, i,
+                          name=self.name_valid,
+                          type=self.type_as_string,
+                          size=self.size_valid,
+                          base_price=self.base_price_valid
+                          )
+
+    def test_create_item_with_invalid_size(self):
+        i = Item.objects.create
+        self.assertRaises(ValueError, i,
+                          name=self.name_valid,
+                          type=self.type_valid,
+                          size=self.size_as_string,
+                          base_price=self.base_price_valid
+                          )
+
+    def test_create_item_with_invalid_base_price(self):
+        i = Item.objects.create
+        self.assertRaises(ValueError, i,
+                          name=self.name_valid,
+                          type=self.type_valid,
+                          size=self.size_valid,
+                          base_price=self.base_price_negative
+                          )
+
+    def test_create_item_with_invalid_extras_price(self):
+        i = Item.objects.create
+        self.assertRaises(ValueError, i,
+                          name=self.name_valid,
+                          type=self.type_valid,
+                          size=self.size_valid,
+                          base_price=self.base_price_valid,
+                          extras_price=self.extras_price_negative
+                          )
+
+
