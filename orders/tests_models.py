@@ -1,9 +1,9 @@
-import unittest
+from unittest import skip
 
 from django.db.utils import DataError
 from django.test import TestCase
 
-from orders.models import Size, Extra, Type, Item, User
+from orders.models import Size, Extra, Type, Item, User, Basket
 
 
 class SizeTest(TestCase):
@@ -128,7 +128,7 @@ class ItemTest(TestCase):
             base_price=self.base_price_valid
         )
 
-        self.assertTrue(isinstance(i, Item))
+        self.assertIsInstance(i, Item)
         self.assertEqual(
             i.__str__(), f'{self.name_valid} - {self.base_price_valid}$')
         self.assertEqual(i.name, self.name_valid)
@@ -206,41 +206,114 @@ class BasketTest(TestCase):
         for num in range(1, 11):
             Extra.objects.create(name=f'test_extra_{num}')
 
-        name = 'test_item_name'
-        type = Type.objects.first()
-        size = Size.objects.first()
-        extras_available = Extra.objects.all()[:4]
-        extras_price = 0.5
-        is_special = True
-        extras_max_quantity = 2
-        base_price = 10
-
-        Item.objejects.create(
-            name=name,
-            type=type,
-            size=size,
-            extras_available=extras_available,
-            extras_price=extras_price,
-            is_special=is_special,
-            extras_max_quantity=extras_max_quantity,
-            base_price=base_price
+        i = Item.objects.create(
+            name='test_item_name',
+            type=Type.objects.first(),
+            size=Size.objects.first(),
+            extras_price=0.5,
+            is_special=True,
+            extras_max_quantity=2,
+            base_price=10
         )
 
+        i.extras_available.set(Extra.objects.all()[:4])
 
-        self.name_valid = 'i' * Item._meta.get_field('name').max_length
-        self.name_toolong = self.name_valid + 'i'
-        self.type_valid = Type.objects.filter(name='test_type').first()
-        self.type_as_string = 'type_as_string'
-        self.size_valid = Size.objects.filter(name='test_size').first()
-        self.size_as_string = 'size_as_string'
-        self.extras_price_valid = '0.5'
-        self.extras_price_negative = '-1'
-        self.base_price_valid = '12.7'
-        self.base_price_negative = '-100'
+        self.user = User.objects.first()
+        self.item = Item.objects.first()
+        self.extras_selected_valid = Extra.objects.all()[:3]
+        self.extras_selected_too_much = Extra.objects.all()
+        self.extras_selected_not_available = Extra.objects.all()[5:7]
 
-        self.default_extras_price = Item._meta.get_field(
-            'extras_price').default
-        self.default_is_special = Item._meta.get_field(
-            'is_special').default
-        self.default_extras_max_quantity = Item._meta.get_field(
-            'extras_max_quantity').default
+        self.special_info_valid = 'i' * Basket._meta.get_field(
+            'special_info').max_length
+        self.special_info_toolong = self.special_info_valid + 'i'
+        self.price_valid = '11'
+        self.price_negative = '-11'
+
+    def test_create_basket_with_valid_data(self):
+        b = Basket.objects.create(
+            user=self.user,
+            item=self.item,
+            special_info=self.special_info_valid,
+            price=self.price_valid
+        )
+
+        self.assertIsInstance(b, Basket)
+        self.assertEqual(
+            b.__str__(), f'{self.item.name} - {self.price_valid}$')
+        self.assertEqual(b.user, self.user)
+        self.assertEqual(b.item, self.item)
+        self.assertEqual(b.special_info, self.special_info_valid)
+
+    def test_create_basket_with_valid_data_add_extras(self):
+        b = Basket.objects.create(
+            user=self.user,
+            item=self.item,
+            special_info=self.special_info_valid,
+            price=self.price_valid
+        )
+        b.extras_selected.set(self.extras_selected_valid)
+
+        self.assertEqual(
+            b.extras_selected.count(), self.extras_selected_valid.count())
+
+    def test_create_basket_with_valid_data_add_extras_too_much(self):
+        b = Basket.objects.create(
+            user=self.user,
+            item=self.item,
+            special_info=self.special_info_valid,
+            price=self.price_valid
+        )
+        b.extras_selected.set(self.extras_selected_too_much)
+
+        self.assertRaises(ValueError, b.save)
+
+    def test_create_basket_with_valid_data_add_extras_not_available(self):
+        b = Basket.objects.create(
+            user=self.user,
+            item=self.item,
+            special_info=self.special_info_valid,
+            price=self.price_valid
+        )
+        b.extras_selected.set(self.extras_selected_not_available)
+
+        self.assertRaises(ValueError, b.save)
+
+    def test_create_basket_with_invalid_special_info(self):
+        b = Basket.objects.create
+
+        self.assertRaises(DataError, b,
+                          user=self.user,
+                          item=self.item,
+                          special_info=self.special_info_toolong,
+                          price=self.price_valid
+                          )
+
+    def test_create_basket_with_invalid_price(self):
+        b = Basket.objects.create
+        self.assertRaises(ValueError, b,
+                          user=self.user,
+                          item=self.item,
+                          special_info=self.special_info_valid,
+                          price=self.price_negative
+                          )
+
+    def test_basket_as_dict(self):
+        b = Basket.objects.create(
+            user=self.user,
+            item=self.item,
+            special_info=self.special_info_valid,
+            price=self.price_valid
+        )
+        b.extras_selected.set(self.extras_selected_valid)
+        d = b.as_dict()
+
+        self.assertIsInstance(d, dict)
+        self.assertEqual(d['id'], b.pk)
+        self.assertEqual(d['item'], self.item.name)
+        self.assertEqual(d['extras_name'], self.item.type.extras_name)
+        self.assertEqual(
+            d['extras_selected'], [e.name for e in self.extras_selected_valid])
+        self.assertEqual(d['special_info'], self.special_info_valid)
+        self.assertEqual(d['price'], self.price_valid)
+

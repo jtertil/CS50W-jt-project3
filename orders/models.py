@@ -68,7 +68,7 @@ class Basket(models.Model):
     extras_selected = models.ManyToManyField(
         Extra, blank=True, related_name='baskets', symmetrical=False,
     )
-    special_info = models.TextField(max_length=300, null=True, blank=True,)
+    special_info = models.CharField(max_length=300, null=True, blank=True)
 
     price = models.DecimalField(
         max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
@@ -82,11 +82,22 @@ class Basket(models.Model):
         if float(self.price) < 0:
             raise ValueError(f'Must be a value greater than or equal to 0')
 
+        if self.extras_selected.count() > self.item.extras_max_quantity:
+            raise ValueError(
+                f'Max quantity of extras: {self.item.extras_max_quantity}')
+
+        for e in self.extras_selected.values():
+            if e not in self.item.extras_available.values():
+                raise ValueError(
+                  f'{e} not in item available extras'
+                )
+
     def as_dict(self):
         return {
             'id': self.pk,
             'item': self.item.name,
             'extras_name': self.item.type.extras_name,
             'extras_selected': [e.name for e in self.extras_selected.all()],
+            'special_info': self.special_info,
             'price': self.price
         }
