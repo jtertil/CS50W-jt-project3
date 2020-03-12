@@ -62,13 +62,12 @@ class UserLoginForm(AuthenticationForm):
 
 
 class AddToBasketForm(forms.ModelForm):
-    class Meta:
-        model = Basket
-        fields = ('type', 'item', 'extras_selected', 'special_info')
-
     type = forms.ModelChoiceField(queryset=Type.objects.all())
     extras_selected = forms.ModelMultipleChoiceField(
             queryset=Extra.objects.all(), required=False)
-
     special_info = forms.CharField(required=False)
+
+    class Meta:
+        model = Basket
+        fields = ('type', 'item', 'extras_selected', 'special_info')
 

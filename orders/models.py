@@ -29,7 +29,6 @@ class Type(models.Model):
 
 
 class Item(models.Model):
-
     name = models.CharField(max_length=100)
     type = models.ForeignKey(
         Type, on_delete=models.CASCADE)
@@ -60,9 +59,6 @@ class Item(models.Model):
 
 
 class Basket(models.Model):
-    class Meta:
-        indexes = [models.Index(fields=['user'])]
-
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # on_delete?
     item = models.ForeignKey(Item, on_delete=models.CASCADE)  # on_delete?
     extras_selected = models.ManyToManyField(
@@ -72,6 +68,9 @@ class Basket(models.Model):
 
     price = models.DecimalField(
         max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
+
+    class Meta:
+        indexes = [models.Index(fields=['user'])]
 
     def __str__(self):
         return f'{self.item.name} - {self.price}$'
