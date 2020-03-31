@@ -54,6 +54,7 @@ def get_basket_items(request):
         'item', 'item__type', 'extras_selected').filter(user=request.user)
     if q:
         basket_items = [i.as_dict() for i in q]
+        print(basket_items)
         return basket_items
     else:
         return None

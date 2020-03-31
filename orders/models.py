@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.contrib.postgres.fields import JSONField
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.contrib.auth.models import User
@@ -100,3 +101,13 @@ class Basket(models.Model):
             'special_info': self.special_info,
             'price': self.price
         }
+
+
+class Order(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # on_delete?
+    data = JSONField()
+    status = models.CharField(
+        max_length = 1,
+        choices = [('1', 'New'), ('2', 'Accepted'), ('3', 'Ready')],
+        default = '1'
+    )
