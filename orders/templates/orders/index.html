@@ -7,30 +7,65 @@
   <h2>Current user: {{ user }}</h2>
 </div>
 
-{% if basket_items %}
-<div id="basket">
+{% if basket %}
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-success" data-toggle="modal" data-target="#place-order-modal">
+  Place order
+</button>
+<!-- Modal -->
+<div class="modal fade" id="place-order-modal" tabindex="-1" role="dialog" aria-labelledby="modal-title" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="place-order-modal-title">Place your order</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="basket">
 
-{% for dish in basket_items %}
-  <p>{{ dish.item }}
-    {% if dish.extras_selected %}
-    (
-    {% for ex in dish.extras_selected %}
-    {% if forloop.last %}
-    {{ ex }} )
-    {% else %}
-    {{ ex }},
-    {% endif %}
-    {% endfor %}
-    {% endif %}
-    - {{ dish.price }}$ <a href='{% url "delete_basket_item" id=dish.id %}'>(delete)</a></p>
-{% endfor %}
+        {% for dish in basket.items %}
+          <p>{{ dish.item }}
+            {% if dish.extras_selected %}
+            (
+            {% for ex in dish.extras_selected %}
+            {% if forloop.last %}
+            {{ ex }} )
+            {% else %}
+            {{ ex }},
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            - {{ dish.price }}$ <a href='{% url "delete_basket_item" id=dish.id %}'>(delete)</a></p>
+        {% endfor %}
 
+        {% if basket.items|length > 1 %}
+        <hr>
+        <p>Total price: {{ basket.value }}$</p>
+        {% endif %}
+
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" data-toggle="modal" data-target="#order-modal">
+  Eat something else!
+</button>
+        <a href='{% url "place_order"%}'>
+          <button  type="button" class="btn btn-success" id="place-order">
+            Confirm
+          </button>
+        </a>
+    </div>
+    </div>
+  </div>
 </div>
-<a href='{% url "place_order"%}'>
-  <button  type="button" class="btn btn-success" id="place-order">
-    Place Order
-  </button>
-</a>
+
+
+
+
+
 
 {% endif %}
 
@@ -74,7 +109,6 @@
     </div>
   </div>
 </div>
-
 
 <button id="menu-toggle" type="button" class="btn btn-info">Show menu</button>
 <div id="menu" style="display: none">

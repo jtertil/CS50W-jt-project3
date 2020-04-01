@@ -31,7 +31,8 @@ class OrderAdmin(admin.ModelAdmin):
 
     readonly_fields = ["value", "user"]
 
-    ordering = ('status', 'pk')
+    ordering = ('status', '-pk')
+
 
 
 admin.site.site_header = "Pinocchio's Pizza & Subs administration site"

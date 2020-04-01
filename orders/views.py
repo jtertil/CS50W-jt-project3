@@ -43,7 +43,7 @@ def index(request):
             'orders/index.html',
             {'menu': menu,
              'form': form,
-             'basket_items': get_basket_items(request)})
+             'basket': get_basket_items(request)})
     else:
         return render(request, 'orders/index.html', {'menu': menu})
 
@@ -54,29 +54,36 @@ def get_basket_items(request, return_queryset=False):
         'item', 'item__type', 'extras_selected').filter(user=request.user)
     if q:
         basket_items = [i.as_dict() for i in q]
-        print(basket_items)
+        basket_value = round(sum([i['price'] for i in basket_items]), 2)
         if return_queryset:
-            return basket_items, q
+            return {'items': basket_items,
+                    'value': basket_value,
+                    'queryset': q
+                    }
         else:
-            return basket_items
+            return {'items': basket_items,
+                    'value': basket_value
+                    }
     else:
         return None
 
 
 def place_order(request):
-    b, q = get_basket_items(request, return_queryset=True)
+    basket = get_basket_items(request, return_queryset=True)
     order = {}
-    value = 0
-    for i, e in enumerate(b):
+    value = basket['value']
+    for i, e in enumerate(basket['items']):
         order[i] = {}
         order[i]['item'] = e['item']
-        order[i]['extras_selected'] = e['extras_selected']
-        order[i]['special_info'] = e['special_info']
-        value += e['price']
+        if e['extras_selected']:
+            order[i]['extras_selected'] = e['extras_selected']
+        if e['special_info']:
+            order[i]['special_info'] = e['special_info']
+        order[i]['price'] = e['price']
 
     o = Order(user=request.user, data=order, value=value)
     o.save()
-    q.delete()
+    basket['queryset'].delete()
 
     return JsonResponse(order)
 
