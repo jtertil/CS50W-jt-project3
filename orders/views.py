@@ -2,13 +2,13 @@ from django.conf import settings
 from django.contrib.auth import login, logout, authenticate
 from django.core.cache import cache
 from django.core.cache.backends.base import DEFAULT_TIMEOUT
-from django.http import HttpResponse, HttpResponseRedirect
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
 
 from .forms import UserRegistrationForm, UserLoginForm, AddToBasketForm
-from .models import Item, Basket
+from .models import Item, Basket, Order
 
 CACHE_TTL = getattr(settings, 'CACHE_TTL', DEFAULT_TIMEOUT)
 
@@ -49,15 +49,36 @@ def index(request):
 
 
 # TODO login only
-def get_basket_items(request):
+def get_basket_items(request, return_queryset=False):
     q = Basket.objects.prefetch_related(
         'item', 'item__type', 'extras_selected').filter(user=request.user)
     if q:
         basket_items = [i.as_dict() for i in q]
         print(basket_items)
-        return basket_items
+        if return_queryset:
+            return basket_items, q
+        else:
+            return basket_items
     else:
         return None
+
+
+def place_order(request):
+    b, q = get_basket_items(request, return_queryset=True)
+    order = {}
+    value = 0
+    for i, e in enumerate(b):
+        order[i] = {}
+        order[i]['item'] = e['item']
+        order[i]['extras_selected'] = e['extras_selected']
+        order[i]['special_info'] = e['special_info']
+        value += e['price']
+
+    o = Order(user=request.user, data=order, value=value)
+    o.save()
+    q.delete()
+
+    return JsonResponse(order)
 
 
 # TODO login only

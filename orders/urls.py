@@ -12,6 +12,7 @@ urlpatterns = [
     path("delete-basket-item/<int:id>", views.delete_basket_item, name="delete_basket_item"),
     path('ajax/items/', views.get_item_options, name= 'ajax_items'),
     path('ajax/extras/', views.get_extras_options, name= 'ajax_extras'),
+    path('place-order/', views.place_order, name= 'place_order'),
 
 
 ]

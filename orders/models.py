@@ -1,9 +1,7 @@
-from decimal import Decimal
-
+from django.contrib.auth.models import User
 from django.contrib.postgres.fields import JSONField
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.contrib.auth.models import User
 
 
 class Size(models.Model):
@@ -99,11 +97,16 @@ class Basket(models.Model):
             'extras_name': self.item.type.extras_name,
             'extras_selected': [e.name for e in self.extras_selected.all()],
             'special_info': self.special_info,
-            'price': self.price
+            'price': float(self.price)
         }
 
 
 class Order(models.Model):
+    def __str__(self):
+        return f'order #{self.pk}'
+
+    value = models.DecimalField(
+        max_digits=6, decimal_places=2, validators=[MinValueValidator(0)])
     user = models.ForeignKey(User, on_delete=models.CASCADE)  # on_delete?
     data = JSONField()
     status = models.CharField(
@@ -111,3 +114,5 @@ class Order(models.Model):
         choices = [('1', 'New'), ('2', 'Accepted'), ('3', 'Ready')],
         default = '1'
     )
+
+

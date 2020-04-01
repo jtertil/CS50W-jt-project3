@@ -26,9 +26,11 @@
 {% endfor %}
 
 </div>
-<button type="button" class="btn btn-success" id="place-order">
-  Place Order
-</button>
+<a href='{% url "place_order"%}'>
+  <button  type="button" class="btn btn-success" id="place-order">
+    Place Order
+  </button>
+</a>
 
 {% endif %}
 
