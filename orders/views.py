@@ -1,3 +1,4 @@
+
 from django.conf import settings
 from django.contrib.auth import login, logout, authenticate
 from django.core.cache import cache
@@ -49,6 +50,27 @@ def index(request):
 
 
 # TODO login only
+def get_my_orders(request):
+    q = Order.objects.filter(user=request.user)
+    if q:
+        orders = {}
+        for o in q:
+            orders[o.id] = {}
+            orders[o.id]['data'] = o.data
+            orders[o.id]['status'] = o.status
+            orders[o.id]['value'] = round(float(o.value), 2)
+        return orders
+    else:
+        return None
+
+
+# TODO login only
+def my_orders(request):
+    orders = get_my_orders(request)
+    return render(request, 'orders/my_orders.html', {'orders': orders})
+
+
+# TODO login only
 def get_basket_items(request, return_queryset=False):
     q = Basket.objects.prefetch_related(
         'item', 'item__type', 'extras_selected').filter(user=request.user)
@@ -68,6 +90,7 @@ def get_basket_items(request, return_queryset=False):
         return None
 
 
+# TODO login only
 def place_order(request):
     basket = get_basket_items(request, return_queryset=True)
     order = {}

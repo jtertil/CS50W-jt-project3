@@ -13,6 +13,7 @@ urlpatterns = [
     path('ajax/items/', views.get_item_options, name= 'ajax_items'),
     path('ajax/extras/', views.get_extras_options, name= 'ajax_extras'),
     path('place-order/', views.place_order, name= 'place_order'),
+    path('my-orders/', views.my_orders, name= 'my_orders'),
 
 
 ]
