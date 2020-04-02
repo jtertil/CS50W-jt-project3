@@ -51,7 +51,7 @@ def index(request):
 
 # TODO login only
 def get_my_orders(request):
-    q = Order.objects.filter(user=request.user)
+    q = Order.objects.filter(user=request.user).order_by('status', '-pk')
     if q:
         orders = {}
         for o in q:

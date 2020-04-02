@@ -111,7 +111,7 @@ class Order(models.Model):
     data = JSONField()
     status = models.CharField(
         max_length = 1,
-        choices = [('1', 'New'), ('2', 'Accepted'), ('3', 'Ready')],
+        choices = [('1', 'New'), ('2', 'Prepared'), ('3', 'Received')],
         default = '1'
     )
 

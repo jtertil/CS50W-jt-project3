@@ -6,17 +6,16 @@
 <div id="user-info">
   <h2>Current user: {{ user }}</h2>
 </div>
-
-
 {% if orders %}
-
   {% for k, v in orders.items %}
   <div class="card m-3">
+    <div class="card-header">
+    Order status: {{ v.status }}, Order number: {{ k }}, Total: {{ v.value }}$
+    </div>
     <div class="card-body">
-      <h5 class="card-title">Order number: {{ k }}, Total: {{ v.value }}$</h5>
-
-          {% for k, v in v.data.items %}
-            <div class="card">
+      <h5 class="card-title"></h5>
+      {% for k, v in v.data.items %}
+      <div class="card border-light">
         <div class="card-body">
           <p>{{ v.item }}
             {% if v.extras_selected %}
@@ -34,9 +33,7 @@
           <footer class="blockquote-footer"><cite title="Special info">{{v.special_info}}</cite></footer>
           {% endif %}
         </div>
-
-
-            </div>
+      </div>
       {% endfor %}
     </div>
   </div>
